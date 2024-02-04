@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 웹 앱</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-size: cover;
+            color: #fff;
+        }
+
+        #app {
+            text-align: center;
+        }
+
+        #weather {
+            margin-top: 20px;
+        }
+
+        input, button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1 id="clock"></h1>
+        <div id="login-form">
+            <input type="text" id="username" placeholder="사용자명을 입력하세요">
+            <button onclick="login()">로그인</button>
+        </div>
+        <div id="todo-list">
+            <h2>할 일 목록</h2>
+            <input type="text" id="todo" placeholder="새로운 할 일을 입력하세요">
+            <button onclick="addTodo()">할 일 추가</button>
+            <ul id="todos"></ul>
+        </div>
+        <div id="weather"></div>
+    </div>
+
+    <script>
+        // 시계
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            document.getElementById('clock').innerText = `${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateClock, 1000);
+
+        // 로컬 스토리지를 사용한 로그인
+        function login() {
+            const username = document.getElementById('username').value;
+            localStorage.setItem('username', username);
+            alert(`${username}님, 환영합니다!`);
+        }
+
+        // 로컬 스토리지를 사용한 할 일 목록
+        function addTodo() {
+            const todo = document.getElementById('todo').value;
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            todos.push(todo);
+            localStorage.setItem('todos', JSON.stringify(todos));
+            displayTodos();
+        }
+
+        function displayTodos() {
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            const todosList = document.getElementById('todos');
+            todosList.innerHTML = '';
+            todos.forEach(todo => {
+                const li = document.createElement('li');
+                li.innerText = todo;
+                todosList.appendChild(li);
+            });
+        }
+
+        displayTodos();
+
+        // 랜덤 배경 이미지
+        const backgrounds = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
+        const randomBackground = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+        document.body.style.backgroundImage = `url(${randomBackground})`;
+
+        // 날씨와 위치 (geolocation)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                // 날씨 데이터를 가져오기 위해 위도와 경도 사용 (날씨 API를 사용할 수 있음)
+                const weatherElement = document.getElementById('weather');
+                weatherElement.innerText = `위도: ${latitude}, 경도: ${longitude}`;
+            }, error => {
+                console.error(error);
+            });
+        } else {
+            console.error('이 브라우저에서는 위치 정보를 지원하지 않습니다.');
+        }
+    </script>
+</body>
+</html>
